@@ -2,7 +2,6 @@ import streamlit as st
 from pytrends.request import TrendReq
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-import time
 
 def main():
     st.title('Google Trends')
@@ -18,7 +17,8 @@ def main():
         selected_country = st.selectbox('Select Country', countries)
 
         # 키워드 입력
-        keyword = st.text_input('Enter Keyword', 'chatgpt')
+        keywords = st.text_input('Enter Keywords (separated by commas)', 'chatgpt, openai, dall-e')
+        keyword_list = [x.strip() for x in keywords.split(',')]
 
         # 날짜 범위 선택 기능 추가
         start_date = st.date_input("Start Date", datetime.now() - timedelta(days=30))
@@ -27,13 +27,12 @@ def main():
         try:
             # Google Trends 데이터 가져오기
             pytrends = TrendReq(hl='ko-KR', tz=540)
-            kw_list = [keyword]
             if selected_country == 'South Korea':
-                pytrends.build_payload(kw_list, geo='KR', timeframe=f"{start_date.strftime('%Y-%m-%d')} {end_date.strftime('%Y-%m-%d')}")
+                pytrends.build_payload(keyword_list, geo='KR', timeframe=f"{start_date.strftime('%Y-%m-%d')} {end_date.strftime('%Y-%m-%d')}")
             elif selected_country == 'United States':
-                pytrends.build_payload(kw_list, geo='US', timeframe=f"{start_date.strftime('%Y-%m-%d')} {end_date.strftime('%Y-%m-%d')}")
+                pytrends.build_payload(keyword_list, geo='US', timeframe=f"{start_date.strftime('%Y-%m-%d')} {end_date.strftime('%Y-%m-%d')}")
             elif selected_country == 'Japan':
-                pytrends.build_payload(kw_list, geo='JP', timeframe=f"{start_date.strftime('%Y-%m-%d')} {end_date.strftime('%Y-%m-%d')}")
+                pytrends.build_payload(keyword_list, geo='JP', timeframe=f"{start_date.strftime('%Y-%m-%d')} {end_date.strftime('%Y-%m-%d')}")
             df = pytrends.interest_over_time()
 
             # 그래프 출력
